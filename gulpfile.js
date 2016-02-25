@@ -245,3 +245,4 @@ gulp.task('test', function (cb) {
 });
 
 gulp.task('default', ['lint', 'test', 'browserify', 'docs']);
+gulp.task('build', ['lint', 'browserify', 'docs']);
