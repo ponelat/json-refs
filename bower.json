@@ -22,7 +22,7 @@
     "test"
   ],
   "dependencies": {
-    "path-loader": "~1.0.1"
+    "path-loader": "ponelat/path-loader"
   },
   "devDependencies": {
     "mocha": "~2.3.4"
