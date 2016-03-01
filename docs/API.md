@@ -16,7 +16,7 @@ JSON Pointers *(https://tools.ietf.org/html/rfc6901)*.
         * [~RetrievedResolvedRefsResults](#module_JsonRefs..RetrievedResolvedRefsResults) : <code>object</code>
         * [~UnresolvedRefDetails](#module_JsonRefs..UnresolvedRefDetails) : <code>object</code>
     * _static_
-        * [.clearCache()](#module_JsonRefs.clearCache)
+        * [.clearCache(urls)](#module_JsonRefs.clearCache)
         * [.decodePath(path)](#module_JsonRefs.decodePath) ⇒ <code>string</code>
         * [.encodePath(path)](#module_JsonRefs.encodePath) ⇒ <code>string</code>
         * [.findRefs(obj, [options])](#module_JsonRefs.findRefs) ⇒ <code>object</code>
@@ -148,10 +148,15 @@ Detailed information about unresolved JSON References.
 | warning | <code>string</code> | The warning information *(Only present when the JSON Reference definition produces a warning)* |
 
 <a name="module_JsonRefs.clearCache"></a>
-### JsonRefs.clearCache()
+### JsonRefs.clearCache(urls)
 Clears the internal cache of remote documents, reference details, etc.
 
 **Kind**: static method of <code>[JsonRefs](#module_JsonRefs)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| urls | <code>string</code> &#124; <code>Array.&lt;string&gt;</code> | urls we wish to invalidate. |
+
 <a name="module_JsonRefs.decodePath"></a>
 ### JsonRefs.decodePath(path) ⇒ <code>string</code>
 Takes an array of path segments and decodes the JSON Pointer tokens in them.

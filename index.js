@@ -712,7 +712,7 @@ function validateOptions (options, obj) {
 /**
  * Clears the internal cache of remote documents, reference details, etc.
  *
- * @param {string | string[]} urls those we wish to invalidate
+ * @param {string | string[]} urls urls we wish to invalidate.
  *
  * @alias module:JsonRefs.clearCache
  */
