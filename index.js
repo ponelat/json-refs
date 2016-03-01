@@ -4,8 +4,8 @@
  * Copyright (c) 2014 Jeremy Whitlock
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
+ * of this software and associated documentation files (the "Software"), to deal
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
@@ -364,6 +364,11 @@ function getRefType (refDetails) {
 }
 
 function getRemoteDocument (url, options) {
+
+  if (options.invalidateUrls) {
+    clearCache(options.invalidateUrls);
+  }
+
   var cacheEntry = remoteCache[url];
   var allTasks = Promise.resolve();
   var loaderOptions = clone(options.loaderOptions || {});
@@ -536,6 +541,10 @@ function validateOptions (options, obj) {
              !isType(options.filter, 'Function') &&
              !isType(options.filter, 'String')) {
     throw new TypeError('options.filter must be an Array, a Function of a String');
+  } else if (!isType(options.invalidateUrls, 'Undefined') &&
+             !isType(options.invalidateUrls, 'Array') &&
+             !isType(options.invalidateUrls, 'String')) {
+    throw new TypeError('options.invalidateUrls must be an Array or a String');
   } else if (!isType(options.includeInvalid, 'Undefined') &&
              !isType(options.includeInvalid, 'Boolean')) {
     throw new TypeError('options.includeInvalid must be a Boolean');
@@ -703,10 +712,25 @@ function validateOptions (options, obj) {
 /**
  * Clears the internal cache of remote documents, reference details, etc.
  *
+ * @param {string | string[]} urls those we wish to invalidate
+ *
  * @alias module:JsonRefs.clearCache
  */
-function clearCache () {
-  remoteCache = {};
+function clearCache (urls) {
+
+  if (typeof url === 'undefined') {
+    remoteCache = {};
+    return;
+  }
+
+  if (isType(urls, 'Array')) {
+    urls.forEach(function (url) {
+      delete remoteCache[url];
+    });
+    return;
+  }
+
+  delete remoteCache[urls];
 }
 
 /**
