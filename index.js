@@ -114,7 +114,7 @@ function combineURIs (u1, u2) {
       combinedDetails = u1Details;
 
       // Join the paths
-      combinedDetails.path = path.join(u1Details.path, u2Details.path);
+      combinedDetails.path = slash(path.join(u1Details.path, u2Details.path));
 
       // Join query parameters
       combinedDetails.query = combineQueryParams(u1Details.query, u2Details.query);
@@ -315,6 +315,52 @@ function findRefsRecursive (obj, options, parents, parentPtrs, allRefs, indirect
   });
 
   allTasks = allTasks
+    .then(function () {
+      // Identify indirect, local circular references (Issue 82)
+      var circulars = [];
+      var processedRefPtrs = [];
+      var processedRefs = [];
+
+      function walkRefs (parentPtrs, parentRefs, refPtr, ref) {
+        Object.keys(allRefs.refs).forEach(function (dRefPtr) {
+          var dRefDetails = allRefs.refs[dRefPtr];
+
+          // Do not process already processed references or references that are not a nested references
+          if (processedRefs.indexOf(ref) === -1 && processedRefPtrs.indexOf(refPtr) === -1 &&
+              circulars.indexOf(ref) === -1 && dRefPtr !== refPtr && dRefPtr.indexOf(ref + '/') === 0) {
+            if (parentRefs.indexOf(ref) > -1) {
+              parentRefs.forEach(function (parentRef) {
+                if (circulars.indexOf(ref) === -1) {
+                  circulars.push(parentRef);
+                }
+              });
+            } else {
+              walkRefs(parentPtrs.concat(refPtr), parentRefs.concat(ref), dRefPtr, dRefDetails.uri);
+            }
+
+            processedRefPtrs.push(refPtr);
+            processedRefs.push(ref);
+          }
+        });
+      }
+
+      Object.keys(allRefs.refs).forEach(function (refPtr) {
+        var refDetails = allRefs.refs[refPtr];
+
+        // Only process local, non-circular references
+        if (refDetails.type === 'local' && !refDetails.circular && circulars.indexOf(refDetails.uri) === -1) {
+          walkRefs([], [], refPtr, refDetails.uri);
+        }
+      });
+
+      Object.keys(allRefs.refs).forEach(function (refPtr) {
+        var refDetails = allRefs.refs[refPtr];
+
+        if (circulars.indexOf(refDetails.uri) > -1) {
+          refDetails.circular = true;
+        }
+      });
+    })
     .then(function () {
       return allRefs;
     });

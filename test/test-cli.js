@@ -82,11 +82,12 @@ var resolveHelp = [
   '',
   '  Options:',
   '',
-  '    -h, --help             output usage information',
-  '    -f, --force            Do not fail when the document has invalid JSON References',
-  '    -H, --header <header>  The header to use when retrieving a remote document',
-  '    -I, --filter <type>    The type of JSON References to resolved',
-  '    -y, --yaml             Output as YAML',
+  '    -h, --help                output usage information',
+  '    -f, --force               Do not fail when the document has invalid JSON References',
+  '    -H, --header <header>     The header to use when retrieving a remote document',
+  '    -I, --filter <type>       The type of JSON References to resolved',
+  '    -w, --warnings-as-errors  Treat warnings as errors',
+  '    -y, --yaml                Output as YAML',
   '',
   ''
 ].join('\n');
@@ -272,11 +273,11 @@ describe('json-refs CLI', function () {
             '',
             '  error: Document has invalid references:',
             '',
-            '  #/missing: JSON Pointer points to missing location: #/some/missing/path',
             '  #/invalid: HTTP URIs must have a host.',
-            '  #/remote/relative/missing: JSON Pointer points to missing location: #/some/missing/path',
-            '  #/remote/relative/child/missing: JSON Pointer points to missing location: #/some/missing/path',
+            '  #/missing: JSON Pointer points to missing location: #/some/missing/path',
             '  #/remote/relative/child/ancestor/missing: JSON Pointer points to missing location: #/some/missing/path',
+            '  #/remote/relative/child/missing: JSON Pointer points to missing location: #/some/missing/path',
+            '  #/remote/relative/missing: JSON Pointer points to missing location: #/some/missing/path',
             '',
             ''
           ].join('\n'));
@@ -355,6 +356,30 @@ describe('json-refs CLI', function () {
         });
       });
 
+      it('--warnings-as-errors option', function (done) {
+        this.timeout(10000);
+
+        executeJsonRefs(['resolve', testDocumentLocation, '--warnings-as-errors'], function (stderr, stdout) {
+          assert.equal(stdout, '');
+
+          assert.equal(stderr, [
+            '',
+            '  error: Document has invalid references:',
+            '',
+            '  #/invalid: HTTP URIs must have a host.',
+            '  #/missing: JSON Pointer points to missing location: #/some/missing/path',
+            '  #/remote/relative/child/ancestor/missing: JSON Pointer points to missing location: #/some/missing/path',
+            '  #/remote/relative/child/missing: JSON Pointer points to missing location: #/some/missing/path',
+            '  #/remote/relative/missing: JSON Pointer points to missing location: #/some/missing/path',
+            '  #/warning: Extra JSON Reference properties will be ignored: ignored',
+            '',
+            ''
+          ].join('\n'));
+
+          done();
+        });
+      });
+
       it('--yaml option', function (done) {
         this.timeout(10000);
 
@@ -376,14 +401,14 @@ describe('json-refs CLI', function () {
           '',
           '  error: Document has invalid references:',
           '',
-          '  #/deferred: JSON Pointer points to missing location: #/project/name',
-          '  #/missing: JSON Pointer points to missing location: #/some/missing/path',
           '  #/ancestor/deferred: JSON Pointer points to missing location: #/project/name',
           '  #/ancestor/missing: JSON Pointer points to missing location: #/some/missing/path',
-          '  #/ancestor/nested/deferred: JSON Pointer points to missing location: #/project/name',
-          '  #/ancestor/nested/missing: JSON Pointer points to missing location: #/some/missing/path',
           '  #/ancestor/nested/child/deferred: JSON Pointer points to missing location: #/project/name',
           '  #/ancestor/nested/child/missing: JSON Pointer points to missing location: #/some/missing/path',
+          '  #/ancestor/nested/deferred: JSON Pointer points to missing location: #/project/name',
+          '  #/ancestor/nested/missing: JSON Pointer points to missing location: #/some/missing/path',
+          '  #/deferred: JSON Pointer points to missing location: #/project/name',
+          '  #/missing: JSON Pointer points to missing location: #/some/missing/path',
           '',
           '',
         ].join('\n');
