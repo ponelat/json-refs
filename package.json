@@ -67,7 +67,7 @@
     "commander": "^2.9.0",
     "js-yaml": "^3.5.2",
     "native-promise-only": "^0.8.1",
-    "path-loader": "ponelat/path-loader",
+    "path-loader": "ponelat/path-loader#hub-1.0.0",
     "slash": "^1.0.0",
     "uri-js": "^2.1.1"
   }
