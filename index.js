@@ -855,6 +855,11 @@ function findRefs (obj, options) {
              node = options.refPreProcessor(clone(node), path);
            }
 
+           // Coerce empty $ref to '#'
+           if(node.$ref === '') {
+             node.$ref = '#'
+           }
+
            refDetails = getRefDetails(node);
 
            // Post-process the reference details
